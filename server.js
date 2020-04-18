@@ -1,5 +1,7 @@
 'use strict';
 
+const url_regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
+
 var express = require('express');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
