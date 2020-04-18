@@ -5,6 +5,7 @@ const url_regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$
 var express = require('express');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 var cors = require('cors');
 
@@ -15,6 +16,14 @@ var port = process.env.PORT || 3000;
 
 /** this project needs a db !! **/ 
 // mongoose.connect(process.env.DB_URI);
+
+// Schema
+const urlSchema = new Schema({
+  original_url: { type: String, required: true }
+})
+
+// Model
+const Url = mongoose.model('Url', urlSchema);
 
 app.use(cors());
 
@@ -32,6 +41,17 @@ app.get('/', function(req, res){
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
+
+app.post('/api/shorturl/new', (req, res) => {
+  const url = req.body;
+  if(url_regex.test(url)){
+    return res.json({"error":"invalid URL"})
+  }
+  dns.lookup(url, () => {
+    
+  });
+  
+})
 
 
 app.listen(port, function () {
