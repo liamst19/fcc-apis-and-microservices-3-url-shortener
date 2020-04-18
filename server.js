@@ -54,19 +54,22 @@ app.post('/api/posthello', (req, res) => {
 app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
   console.log(url)
-  const urlRegex = /^(https?:\/\/)([\w.]+)([\/\w-]+)$/
-  const name = url.match(urlRegex);
-  
-  if(name.length > 3){
-    dns.lookup(url.match(urlRegex)[2], (e, r) => {
+  const urlRegex = /^(https?:\/\/)([\w.]+)(\/[\w-]+)?$/
+  const name = url.match(urlRegex); 
+  let retVal = { "error":"invalid URL" };
+  if(name.length > 2){
+    dns.lookup(name[2], (e, r) => {
+      console.log({name: name[2], ...e, r})
       if(!e){
-        return res.json({ success: r });
-      } else return res.json({ "error":"invalid URL" })
+        retVal = { "success": r };
+        // Save to DB
+        
+        
+      }
+      res.json(retVal);
     });
-  }
-  
-  return res.json({ "error":"invalid URL" });
-});
+  } else res.json(retVal)
+  });
 
 
 app.listen(port, function () {
