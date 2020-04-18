@@ -4,6 +4,8 @@ const url_regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$
 const dns = require('dns');
 
 var express = require('express');
+var bodyParser = require('body-parser')
+
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
@@ -30,6 +32,7 @@ app.use(cors());
 
 /** this project needs to parse POST bodies **/
 // you should mount the body-parser here
+app.use(bodyParser);
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
@@ -42,6 +45,11 @@ app.get('/', function(req, res){
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
+
+app.post('/api/posthello', (req, res) => {
+  console.log(req.body)
+  res.json({ posted: req.body})
+})
 
 app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
