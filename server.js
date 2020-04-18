@@ -55,15 +55,18 @@ app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
   console.log(url)
   const urlRegex = /^(https?:\/\/)([\w.]+)([\/\w-]+)$/
-  if(urlRegex.test(url)){
-    dns.lookup(url, (e, r) => {
-      console.log('valid url', {e, r})
-      return res.json({
-        "success": true
-      });
+  const name = url.match(urlRegex);
+  
+  if(name.length > 3){
+    dns.lookup(url.match(urlRegex)[2], (e, r) => {
+      if(!e){
+        return res.json({ success: r });
+      } else return res.json({ "error":"invalid URL" })
     });
-  } else return res.json({"error":"invalid URL"});
-})
+  }
+  
+  return res.json({ "error":"invalid URL" });
+});
 
 
 app.listen(port, function () {
