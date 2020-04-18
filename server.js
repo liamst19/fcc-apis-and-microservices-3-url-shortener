@@ -54,7 +54,8 @@ app.post('/api/posthello', (req, res) => {
 app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
   console.log(url)
-  if(url_regex.test(url)){
+  const urlRegex = /^(https?:\/\/)([\w.]+)([\/\w-]+)$/
+  if(urlRegex.test(url)){
     dns.lookup(url, (e, r) => {
       console.log('valid url', {e, r})
       return res.json({
