@@ -55,16 +55,13 @@ app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
   
   if(url_regex.test(url)){
-    dns.lookup(url, () => {
-      console.log('valid url')
-      res.json({
-        "success"
-      })
-      return
+    dns.lookup(url, e => {
+      console.log('valid url', e)
+      return res.json({
+        "success": true
+      });
     });
-  } 
-  
-  return res.json({"error":"invalid URL"});
+  } else return res.json({"error":"invalid URL"});
 })
 
 
