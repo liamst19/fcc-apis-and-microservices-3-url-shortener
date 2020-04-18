@@ -1,6 +1,7 @@
 'use strict';
 
 const url_regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
+const dns = require('dns');
 
 var express = require('express');
 var mongo = require('mongodb');
@@ -44,13 +45,15 @@ app.get("/api/hello", function (req, res) {
 
 app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
-  if(url_regex.test(url)){
-    return res.json({"error":"invalid URL"})
-  }
-  dns.lookup(url, () => {
-    
-  });
   
+  if(url_regex.test(url)){
+    dns.lookup(url, () => {
+      console.log('valid url')
+      
+    });
+  } 
+  
+  return res.json({"error":"invalid URL"});
 })
 
 
