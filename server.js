@@ -63,16 +63,15 @@ app.post('/api/shorturl/new', (req, res) => {
   console.log(urlToSave)
   const urlRegex = /^(https?:\/\/)([\w.]+)\/?(\/[\w-]+)?$/
   const name = urlToSave.match(urlRegex); 
-  let retVal = { "error":"invalid URL" };
-  console.log('name', name)
+  let invalidRet = { "error":"invalid URL" };
   if(name.length > 2){
     dns.lookup(name[2], (e, r) => {
-      console.log('url is valid' ,{name: name[2], ...e, r})
       if(e){
-        res.json({ error: 'invalid URL'});
+        console.log("error", e);
+        res.json(invalidRet);
         return;
-      } else {}
-         console.log('saving to db')
+      } else {
+        console.log('saving to db')
         Url.find({ original_url: urlToSave }, (err, fromDb) => {
           console.log('error', {err, fromDb})
           //Url already exists
@@ -99,7 +98,7 @@ app.post('/api/shorturl/new', (req, res) => {
         })
       }
     });
-  } else res.json(retVal)
+  } else res.json(invalidRet)
   });
 
 
