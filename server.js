@@ -56,14 +56,19 @@ app.post('/api/posthello', (req, res) => {
 })
 
 app.get('/api/shorturl/:surl', (req, res) => {
-  const short_url = req.query.surl;
+  const short_url = req.params.surl;
   console.log(short_url)
-  Url.findOne({short_url}, (err, url) => {
+  Url.find({_id:short_url}, (err, url) => {
+    console.log({short_url, err, url})
     if(err){
       console.log("error", err)
       res.json({ error: "err"});
     } else {
-      res.redirect(url.original_url)
+      if(url && url[0] && url[0].original_url){
+        res.redirect(url.original_url)
+      } else {
+        res.json({ error: 'not found'})
+      }
     }
   })
 })
