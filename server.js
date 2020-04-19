@@ -54,6 +54,23 @@ app.post('/api/posthello', (req, res) => {
   res.json({ posted: req.body, time: new Date()})
 })
 
+const saveToDB = urlToSave => {
+  const fromDb = Url.find({ original_url: urlToSave });
+  //Url already exists
+  if(fromDb.length > 0){
+    return { original_url: fromDb.original_url, short_url: fromDb._id };
+  }
+  
+  const newUrl = new Url({ original_url: urlToSave });
+  // save to DB
+  newUrl.save((err, retUrl) => {
+    console.log('saved', {err, retUrl});
+    if(err){
+      console.log(err)
+    }
+  })
+}
+
 app.post('/api/shorturl/new', (req, res) => {
   const url = req.body;
   console.log(url)
@@ -62,21 +79,28 @@ app.post('/api/shorturl/new', (req, res) => {
   let retVal = { "error":"invalid URL" };
   if(name.length > 2){
     dns.lookup(name[2], (e, r) => {
-      console.log({name: name[2], ...e, r})
+      console.log('url is valid' ,{name: name[2], ...e, r})
       if(!e){
+        console.log('accessing db')
         // Look for preexisting
         const fromDb = Url.find({ original_url: url });
         if(fromDb.length > 0){
+          console.log('url exists')
           retVal = { original_url: fromDb.original_url,"short_url": fromDb._id };
         } else {
-          (new Url({ original_url: url })).save(err => {
-            
-          })
+          const saveUrl = new Url({ original_url: url });
+          saveUrl.save((err, u) => {
+            console.log('saving to db')
+            if(err) console.log(err)
+            else {
+              console.log('returning new url')
+              retVal = { original_url: u.original_url,"short_url": u._id};
+              res.json(retVal);
+              return;
+            }
+          });
+          return
         }
-        // Save to DB
-        
-        
-        
       }
       res.json(retVal);
     });
