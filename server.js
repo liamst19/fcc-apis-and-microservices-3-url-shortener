@@ -8,6 +8,8 @@ var bodyParser = require('body-parser')
 
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
+var uniqueValidator = require('mongoose-unique-validator');
+
 const Schema = mongoose.Schema;
 
 var cors = require('cors');
@@ -22,9 +24,10 @@ var port = process.env.PORT || 3000;
 
 // Schema
 const urlSchema = new Schema({
-  original_url: { type: String, required: true }
+  original_url: { type: String, required: true, unique: true }
 })
 
+urlSchema.plugin(uniqueValidator);
 // Model
 const Url = mongoose.model('Url', urlSchema);
 
@@ -61,8 +64,17 @@ app.post('/api/shorturl/new', (req, res) => {
     dns.lookup(name[2], (e, r) => {
       console.log({name: name[2], ...e, r})
       if(!e){
-        retVal = { "success": r };
+        // Look for preexisting
+        const fromDb = Url.find({ original_url: url });
+        if(fromDb.length > 0){
+          retVal = { original_url: fromDb.original_url,"short_url": fromDb._id };
+        } else {
+          (new Url({ original_url: url })).save(err => {
+            
+          })
+        }
         // Save to DB
+        
         
         
       }

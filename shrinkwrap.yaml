@@ -4,6 +4,7 @@ dependencies:
   express: 4.17.1
   mongodb: 3.5.6
   mongoose: 5.9.9
+  mongoose-unique-validator: 2.0.3
 packages:
   /accepts/1.3.7:
     dependencies:
@@ -260,6 +261,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-l3hLhffs9zqoDe8zjmb/mAN4B8VT3L56EUvKNqLFVs9YlFA+zx7ke1DO8STAdDyYNkeSo1nKmjuvQeI12So8Xw==
+  /lodash.foreach/4.5.0:
+    dev: false
+    resolution:
+      integrity: sha1-Gmo16s5AEoDH8G3d7DUWWrJ+PlM=
+  /lodash.get/4.4.2:
+    dev: false
+    resolution:
+      integrity: sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=
   /media-typer/0.3.0:
     dev: false
     engines:
@@ -336,6 +345,15 @@ packages:
       mongoose: '*'
     resolution:
       integrity: sha512-Yo/7qQU4/EyIS8YDFSeenIvXxZN+ld7YdV9LqFVQJzTLye8unujAWPZ4NWKfFA+RNjh+wvTWKY9Z3E5XM6ZZiQ==
+  /mongoose-unique-validator/2.0.3:
+    dependencies:
+      lodash.foreach: 4.5.0
+      lodash.get: 4.4.2
+    dev: false
+    peerDependencies:
+      mongoose: ^5.2.1
+    resolution:
+      integrity: sha512-3/8pmvAC1acBZS6eWKAWQUiZBlARE1wyWtjga4iQ2wDJeOfRlIKmAvTNHSZXKaAf7RCRUd7wh7as6yWAOrjpQg==
   /mongoose/5.9.9:
     dependencies:
       bson: 1.1.4
@@ -613,3 +631,4 @@ specifiers:
   express: ^4.17.1
   mongodb: ^3.3.3
   mongoose: ^5.7.7
+  mongoose-unique-validator: ^2.0.3
