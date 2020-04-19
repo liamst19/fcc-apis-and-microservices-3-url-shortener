@@ -55,54 +55,44 @@ app.post('/api/posthello', (req, res) => {
 })
 
 const saveToDB = urlToSave => {
-  const fromDb = Url.find({ original_url: urlToSave });
-  //Url already exists
-  if(fromDb.length > 0){
-    return { original_url: fromDb.original_url, short_url: fromDb._id };
-  }
-  
-  const newUrl = new Url({ original_url: urlToSave });
-  // save to DB
-  newUrl.save((err, retUrl) => {
-    console.log('saved', {err, retUrl});
-    if(err){
-      console.log(err)
-    }
-  })
+
 }
 
 app.post('/api/shorturl/new', (req, res) => {
-  const url = req.body;
-  console.log(url)
+  const urlToSave = req.body;
+  console.log(urlToSave)
   const urlRegex = /^(https?:\/\/)([\w.]+)(\/[\w-]+)?$/
-  const name = url.match(urlRegex); 
+  const name = urlToSave.match(urlRegex); 
   let retVal = { "error":"invalid URL" };
   if(name.length > 2){
     dns.lookup(name[2], (e, r) => {
       console.log('url is valid' ,{name: name[2], ...e, r})
       if(!e){
-        console.log('accessing db')
-        // Look for preexisting
-        const fromDb = Url.find({ original_url: url });
+        
+        console.log('saving to db')
+        const fromDb = Url.find({ original_url: urlToSave });
+        //Url already exists
         if(fromDb.length > 0){
-          console.log('url exists')
-          retVal = { original_url: fromDb.original_url,"short_url": fromDb._id };
-        } else {
-          const saveUrl = new Url({ original_url: url });
-          saveUrl.save((err, u) => {
-            console.log('saving to db')
-            if(err) console.log(err)
-            else {
-              console.log('returning new url')
-              retVal = { original_url: u.original_url,"short_url": u._id};
-              res.json(retVal);
-              return;
-            }
-          });
-          return
+          console.log('url exists in db')
+          res.json({ original_url: fromDb.original_url, short_url: fromDb._id });
+          return;
         }
+        console.log('saving new url')
+        const newUrl = new Url({ original_url: urlToSave });
+        // save to DB
+        newUrl.save((err, retUrl) => {
+          if(err){
+            console.log('error', err)
+            res.json({ 'error': err })
+            return;
+          } else {
+            console.log('saved to db', {err, retUrl});
+            res.json({ original_url: retUrl.original_url, short_url: retUrl._id })
+            return
+          }
+        })
       }
-      res.json(retVal);
+      // res.json({ 'error': 'something went wrong' })
     });
   } else res.json(retVal)
   });
