@@ -5,7 +5,8 @@ const dns = require('dns');
 
 var express = require('express');
 var bodyParser = require('body-parser')
-
+var crypto = require('crypto')
+var shasum = crypto.createHash('sha1')
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');
@@ -54,9 +55,18 @@ app.post('/api/posthello', (req, res) => {
   res.json({ posted: req.body, time: new Date()})
 })
 
-const saveToDB = urlToSave => {
-
-}
+app.get('/api/shorturl/:surl', (req, res) => {
+  const short_url = req.query.surl;
+  console.log(short_url)
+  Url.findOne({short_url}, (err, url) => {
+    if(err){
+      console.log("error", err)
+      res.json({ error: "err"});
+    } else {
+      res.redirect(url.original_url)
+    }
+  })
+})
 
 app.post('/api/shorturl/new', (req, res) => {
   const urlToSave = req.body;
@@ -73,11 +83,15 @@ app.post('/api/shorturl/new', (req, res) => {
       } else {
         console.log('saving to db')
         Url.find({ original_url: urlToSave }, (err, fromDb) => {
-          console.log('error', {err, fromDb})
+          if(err){
+            console.log('error', {err, fromDb})
+            res.json({ error: 'error '})
+            return
+          }
           //Url already exists
-          if(!fromDb && fromDb.length > 0){
+          if(fromDb && fromDb.length > 0){
             console.log('url exists in db')
-            res.json({ original_url: fromDb[0].original_url, short_url: fromDb[0].__v });
+            res.json({ original_url: fromDb[0].original_url, short_url: fromDb[0]._id });
             return;
           } else {
             console.log('saving new url')
@@ -90,7 +104,7 @@ app.post('/api/shorturl/new', (req, res) => {
                 return;
               } else {
                 console.log('saved to db', {err, retUrl});
-                res.json({ original_url: retUrl.original_url, short_url: retUrl.__v })
+                res.json({ original_url: retUrl.original_url, short_url: retUrl._id })
                 return;
               }
             })

@@ -12,7 +12,8 @@
     "mongoose": "^5.7.7",
     "cors": "^2.8.5",
     "body-parser": "^1.19.0",
-    "mongoose-unique-validator": "^2.0.3"
+    "mongoose-unique-validator": "^2.0.3",
+    "crypto": "^1.0.1"
   },
   "engines": {
     "node": "10.17.0"
