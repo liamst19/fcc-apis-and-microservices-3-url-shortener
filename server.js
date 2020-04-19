@@ -20,7 +20,7 @@ var app = express();
 var port = process.env.PORT || 3000;
 
 /** this project needs a db !! **/ 
-// mongoose.connect(process.env.DB_URI);
+mongoose.connect(process.env.DB_URI);
 
 // Schema
 const urlSchema = new Schema({
@@ -70,28 +70,30 @@ app.post('/api/shorturl/new', (req, res) => {
       if(!e){
         
         console.log('saving to db')
-        const fromDb = Url.find({ original_url: urlToSave });
-        //Url already exists
-        if(fromDb.length > 0){
-          console.log('url exists in db')
-          res.json({ original_url: fromDb.original_url, short_url: fromDb._id });
-          return;
-        }
-        console.log('saving new url')
-        const newUrl = new Url({ original_url: urlToSave });
-        // save to DB
-        newUrl.save((err, retUrl) => {
-          if(err){
-            console.log('error', err)
-            res.json({ 'error': err })
+        Url.find({ original_url: urlToSave }, (err, fromDb) => {
+          console.log('error', {err, fromDb})
+          //Url already exists
+          if(fromDb.length > 0){
+            console.log('url exists in db')
+            res.json({ original_url: fromDb.original_url, short_url: fromDb._id });
             return;
-          } else {
-            console.log('saved to db', {err, retUrl});
-            res.json({ original_url: retUrl.original_url, short_url: retUrl._id })
-            return
           }
+          console.log('saving new url')
+          const newUrl = new Url({ original_url: urlToSave });
+          // save to DB
+          newUrl.save((err, retUrl) => {
+            if(err){
+              console.log('error', err)
+              res.json({ 'error': err })
+              return;
+            } else {
+              console.log('saved to db', {err, retUrl});
+              res.json({ original_url: retUrl.original_url, short_url: retUrl._id })
+              return
+            }
+          })
         })
-      }
+    }
       // res.json({ 'error': 'something went wrong' })
     });
   } else res.json(retVal)
